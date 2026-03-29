@@ -1,13 +1,13 @@
 <?php
 if (file_exists('.env')) {
-    $env = parse_ini_file('.env');
-
-    $DB_HOST = $env["DB_HOST"] ?? null;
-    $DB_NAME = $env["DB_NAME"] ?? null;
-    $DB_USER = $env["DB_USER"] ?? null;
-    $DB_PASS = $env["DB_PASS"] ?? null;
+  $env = parse_ini_file('.env');
 }
-
+  
+$DB_HOST = $env["DB_HOST"] ?? null;
+$DB_NAME = $env["DB_NAME"] ?? null;
+$DB_USER = $env["DB_USER"] ?? null;
+$DB_PASS = $env["DB_PASS"] ?? null;
+  
 try {
   $pdo = new PDO(
     "mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4",
