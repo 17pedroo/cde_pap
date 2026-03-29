@@ -9,6 +9,7 @@ $DB_USER = $env["DB_USER"] ?? null;
 $DB_PASS = $env["DB_PASS"] ?? null;
   
 try {
+  echo("mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4")
   $pdo = new PDO(
     "mysql:host=$DB_HOST;dbname=$DB_NAME;charset=utf8mb4",
     $DB_USER,
