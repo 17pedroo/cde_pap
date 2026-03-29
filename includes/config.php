@@ -7,10 +7,10 @@ if (file_exists('.env')) {
   $DB_USER = $env["DB_USER"] ?? null;
   $DB_PASS = $env["DB_PASS"] ?? null;
 } else {
-  $DB_HOST = get_env("DB_HOST") ?? null;
-  $DB_NAME = get_env("DB_NAME") ?? null;
-  $DB_USER = get_env("DB_USER") ?? null;
-  $DB_PASS = get_env("DB_PASS") ?? null;
+  $DB_HOST = getenv("DB_HOST") ?? null;
+  $DB_NAME = getenv("DB_NAME") ?? null;
+  $DB_USER = getenv("DB_USER") ?? null;
+  $DB_PASS = getenv("DB_PASS") ?? null;
 }
   
 try {
