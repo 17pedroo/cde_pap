@@ -1,8 +1,12 @@
 <?php
-$DB_HOST = "localhost";
-$DB_NAME = "pap";
-$DB_USER = "root";
-$DB_PASS = "";
+if (file_exists('.env')) {
+    $env = parse_ini_file('.env');
+
+    $DB_HOST = $env["DB_HOST"] ?? null;
+    $DB_NAME = $env["DB_NAME"] ?? null;
+    $DB_USER = $env["DB_USER"] ?? null;
+    $DB_PASS = $env["DB_PASS"] ?? null;
+}
 
 try {
   $pdo = new PDO(
