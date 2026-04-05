@@ -2,8 +2,8 @@
 require __DIR__ . "/includes/config.php";
 
 if (!empty($_SESSION["user_id"])) {
-  if (($_SESSION["role"] ?? "") === "student") {
-    header("Location: dashboard.php");
+  if (($_SESSION["role"] ?? "") === "guardian") {
+    header("Location: guardian_dashboard.php");
   } else {
     session_destroy();
   }
@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $student_number = trim($_POST["student_number"] ?? "");
   $password = $_POST["password"] ?? "";
 
-  $stmt = $pdo->prepare("SELECT * FROM users WHERE student_number=? AND role='student'");
+  $stmt = $pdo->prepare("SELECT * FROM users WHERE student_number=? AND role='guardian'");
   $stmt->execute([$student_number]);
   $user = $stmt->fetch();
 
@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION["user_id"] = $user["id"];
     $_SESSION["name"] = $user["name"];
     $_SESSION["role"] = $user["role"];
-    header("Location: dashboard.php");
+    header("Location: guardian_dashboard.php");
     exit;
   } else {
     $error = "Credenciais inválidas.";
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Login - Cartão Digital</title>
+<title>Login - Encarregado</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     min-height: 100vh;
     background: url("assets/img/escola.jpg") center/cover no-repeat;
     position: relative;
-    padding-bottom: 70px; /* espaço para o rodapé fixo (mais discreto) */
+    padding-bottom: 70px;
   }
 
   body::before {
@@ -72,7 +72,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     border-radius: 14px;
   }
 
-  /* Rodapé de logótipos (mais premium e menos alto) */
   .footer-logos {
     position: fixed;
     left: 0; right: 0; bottom: 0;
@@ -109,7 +108,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <div class="card shadow-lg login-card">
     <div class="card-body p-4">
 
-      <!-- Logos da escola (menor e mais elegante) -->
       <img
         src="assets/img/topo_escola.jpg"
         alt="Logótipos da escola"
@@ -118,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       >
 
       <h3 class="mb-1 text-center fw-semibold">Cartão Digital</h3>
-      <p class="text-muted text-center small mb-3">Sistema de gestão escolar</p>
+      <p class="text-muted text-center small mb-3">Acesso para encarregados de educação</p>
 
       <?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -126,7 +124,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       <form method="post">
         <div class="mb-3">
-          <label class="form-label">Número de aluno</label>
+          <label class="form-label">Login do encarregado</label>
           <input type="text" name="student_number" class="form-control" required>
         </div>
 
@@ -140,8 +138,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="text-center mt-3">
-          <a class="small text-decoration-none text-light-emphasis me-3" href="staff_login.php">Sou da portaria</a>
-          <a class="small text-decoration-none text-light-emphasis" href="guardian_login.php">Sou encarregado</a>
+          <a class="small text-decoration-none text-light-emphasis me-3" href="login.php">Sou aluno</a>
+          <a class="small text-decoration-none text-light-emphasis" href="staff_login.php">Sou da portaria</a>
         </div>
       </form>
     </div>

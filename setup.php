@@ -5,13 +5,21 @@ require __DIR__ . "/includes/config.php";
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  role ENUM('student','staff','admin') NOT NULL DEFAULT 'student',
+  role ENUM('student','staff','admin','guardian') NOT NULL DEFAULT 'student',
   student_number VARCHAR(20) UNIQUE,
   name VARCHAR(120) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   qr_secret VARCHAR(64) NOT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS guardian_students (
+  guardian_id INT NOT NULL,
+  student_id INT NOT NULL,
+  PRIMARY KEY (guardian_id, student_id),
+  FOREIGN KEY (guardian_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS wallets (
@@ -71,6 +79,17 @@ if ($existingStaff) {
 } else {
   $staff = create_user($pdo, "staff", null, "Portaria Demo", "admin123", "staff-secret");
 }
+
+// Encarregado de educação demo
+$stmt = $pdo->prepare("SELECT id FROM users WHERE role = ? AND student_number = ? LIMIT 1");
+$stmt->execute(['guardian', 'parent1']);
+$guardian = $stmt->fetchColumn();
+if (!$guardian) {
+  $guardian = create_user($pdo, "guardian", "parent1", "Encarregado Demo", "1234", "guardian-secret");
+}
+
+// Associações entre encarregados e alunos
+$pdo->exec("INSERT IGNORE INTO guardian_students(guardian_id, student_id) VALUES ($guardian, $aluno1)");
 
 // Carteiras (saldo)
 $pdo->exec("INSERT IGNORE INTO wallets(user_id, balance_cents) VALUES ($aluno1, 1250), ($aluno2, 500)");

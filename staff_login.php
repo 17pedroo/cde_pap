@@ -1,6 +1,15 @@
 <?php
 require __DIR__ . "/includes/config.php";
 
+if (!empty($_SESSION["user_id"])) {
+  if (($_SESSION["role"] ?? "") === "staff" || ($_SESSION["role"] ?? "") === "admin") {
+    header("Location: scanner.php");
+  } else {
+    session_destroy();
+  }
+  exit;
+}
+
 $error = null;
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {

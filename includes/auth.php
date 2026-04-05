@@ -13,3 +13,11 @@ function require_staff() {
     die("Acesso negado.");
   }
 }
+
+function require_guardian() {
+  require_login();
+  if (($_SESSION["role"] ?? "") !== "guardian") {
+    http_response_code(403);
+    die("Acesso negado.");
+  }
+}

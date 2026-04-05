@@ -60,14 +60,16 @@ function page_header(string $title) { ?>
         <a class="btn btn-outline-primary btn-sm" href="movimentos.php">Movimentos</a>
         <a class="btn btn-outline-primary btn-sm" href="acessos.php">Acessos</a>
       <?php endif; ?>
+      <?php if (($_SESSION["role"] ?? "") === "guardian"): ?>
+        <a class="btn btn-outline-primary btn-sm" href="guardian_dashboard.php">Aluno</a>
+      <?php endif; ?>
       <a class="btn btn-outline-primary btn-sm" href="sobre.php">Sobre</a>
 
       <?php if (($_SESSION["role"] ?? "") === "staff" || ($_SESSION["role"] ?? "") === "admin"): ?>
         <a class="btn btn-outline-dark btn-sm" href="scanner.php">Scanner</a>
-        <?php if (($_SESSION["role"] ?? "") === "student"): ?>
-          <a class="btn btn-outline-dark btn-sm" href="portaria_logs.php">Leituras</a>
-        <?php endif; ?>
+        <a class="btn btn-outline-dark btn-sm" href="portaria_logs.php">Leituras</a>
         <a class="btn btn-outline-dark btn-sm" href="register_student.php">Alunos</a>
+        <a class="btn btn-outline-dark btn-sm" href="register_guardian.php">Encarregados</a>
       <?php endif; ?>
 
       <a class="btn btn-outline-secondary btn-sm" href="logout.php">Sair</a>
