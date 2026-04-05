@@ -2,10 +2,13 @@
 require __DIR__ . "/includes/config.php";
 
 if (!empty($_SESSION["user_id"])) {
-  if (($_SESSION["role"] ?? "") === "staff" || ($_SESSION["role"] ?? "") === "admin") {
+  $role = $_SESSION["role"] ?? "";
+  if ($role === "staff" || $role === "admin") {
     header("Location: scanner.php");
-  } else {
-    session_destroy();
+  } elseif ($role === "student") {
+    header("Location: dashboard.php");
+  } elseif ($role === "guardian") {
+    header("Location: guardian_dashboard.php");
   }
   exit;
 }
