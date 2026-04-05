@@ -31,6 +31,8 @@ require_staff();
     <button id="btnFS" class="btn btn-dark">Ecrã inteiro</button>
     <button id="btnSwitchCam" class="btn btn-outline-dark">Trocar câmara</button>
     <button id="btnReload" class="btn btn-outline-secondary">Recarregar</button>
+  
+    <a href="register_student.php" class="ms-auto"><button class="btn btn-outline-success">Gestão alunos</button></a>
   </div>
 
   <div class="card shadow-sm">
@@ -53,6 +55,7 @@ require_staff();
 </audio>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   const resultEl  = document.getElementById('result');
   const detailsEl = document.getElementById('details');

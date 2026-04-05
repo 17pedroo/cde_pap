@@ -1,6 +1,7 @@
 <?php
-if (file_exists('.env')) {
-  $env = parse_ini_file('.env');
+$env_path = __DIR__ . "/../.env";
+if (file_exists($env_path)) {
+  $env = parse_ini_file($env_path);
   
   $DB_HOST = $env["DB_HOST"] ?? null;
   $DB_NAME = $env["DB_NAME"] ?? null;
