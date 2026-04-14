@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="text-center mt-3">
-          <a class="small text-decoration-none text-light-emphasis me-3" href="staff_login.php">Sou da portaria</a>
+          <a class="small text-decoration-none text-light-emphasis me-3" href="staff_login.php">Sou administrador</a>
           <a class="small text-decoration-none text-light-emphasis" href="guardian_login.php">Sou encarregado</a>
         </div>
       </form>

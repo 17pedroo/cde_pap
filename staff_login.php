@@ -4,7 +4,7 @@ require __DIR__ . "/includes/config.php";
 if (!empty($_SESSION["user_id"])) {
   $role = $_SESSION["role"] ?? "";
   if ($role === "staff" || $role === "admin") {
-    header("Location: scanner.php");
+    header("Location: register_student.php");
   } elseif ($role === "student") {
     header("Location: dashboard.php");
   } elseif ($role === "guardian") {
@@ -27,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION["user_id"] = (int)$u["id"];
     $_SESSION["role"] = $u["role"];
     $_SESSION["name"] = $u["name"];
-    header("Location: scanner.php");
+    header("Location: register_student.php");
     exit;
   } else {
     $error = "Palavra-passe inválida.";
@@ -120,7 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       >
 
       <h3 class="text-center mb-1 fw-semibold">Cartão Digital</h3>
-      <div class="text-center text-muted small mb-3">Acesso Portaria</div>
+      <div class="text-center text-muted small mb-3">Acesso Administrador</div>
 
       <?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
