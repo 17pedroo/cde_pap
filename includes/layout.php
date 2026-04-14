@@ -13,27 +13,72 @@ function page_header(string $title) { ?>
   <title><?= htmlspecialchars($title) ?></title>
 
   <style>
-    .app-wrap { max-width: 980px; }
-    .brand-sub { font-size: .78rem; color: #6c757d; margin-top:-2px; }
+    :root {
+      color-scheme: light;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #111827;
+    }
 
-    /* Faixas de logótipos (TOP e FOOTER) */
-    .logos-bar { background:#fff; }
-    .logos-inner { max-width: 980px; margin: 0 auto; padding: 10px 12px; }
+    body {
+      background: radial-gradient(circle at top left, rgba(13, 110, 253, 0.12), transparent 24%),
+                  radial-gradient(circle at top right, rgba(102, 16, 242, 0.09), transparent 30%),
+                  #f8fafc;
+      min-height: 100vh;
+    }
 
-    /* Mantém proporção SEM esticar e limita altura */
+    .app-wrap { max-width: 1100px; }
+    .brand-sub { font-size: .78rem; color: #6c757d; margin-top: -2px; }
+
+    .logos-bar {
+      background: rgba(255,255,255,0.96);
+      box-shadow: inset 0 -1px rgba(15,23,42,0.04);
+    }
+    .logos-inner { max-width: 1100px; margin: 0 auto; padding: 12px 16px; }
+
     .logo-img {
       width: 100%;
-      height: 78px;           /* altura no PC */
-      object-fit: contain;    /* não deforma */
+      height: 78px;
+      object-fit: contain;
       display: block;
     }
     .logo-img.footer { height: 70px; }
 
-    /* Mobile: baixa um pouco a altura */
+    .navbar {
+      background: rgba(255,255,255,0.94) !important;
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(15,23,42,0.08);
+      box-shadow: 0 24px 70px rgba(15,23,42,0.06);
+    }
+
+    .navbar-brand {
+      letter-spacing: 0.04em;
+    }
+
+    .btn {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .card {
+      border: none;
+      border-radius: 1.15rem;
+      box-shadow: 0 20px 48px rgba(15,23,42,0.08);
+    }
+    .card.shadow-sm {
+      box-shadow: 0 14px 32px rgba(15,23,42,0.06);
+    }
+
+    .table th,
+    .table td {
+      vertical-align: middle;
+    }
+
     @media (max-width: 576px) {
       .logo-img { height: 56px; }
       .logo-img.footer { height: 52px; }
-      .logos-inner { padding: 8px 10px; }
+      .logos-inner { padding: 10px 12px; }
     }
   </style>
 </head>

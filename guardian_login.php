@@ -44,64 +44,120 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+  :root {
+    color-scheme: light;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
   body {
     min-height: 100vh;
-    background: url("assets/img/escola.jpg") center/cover no-repeat;
+    margin: 0;
     position: relative;
-    padding-bottom: 70px;
+    overflow: hidden;
+    color: #111827;
+    background: rgba(23, 26, 37, 0.32);
   }
-
   body::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.42);
-    backdrop-filter: blur(6px);
+    background: radial-gradient(circle at 24% 24%, rgba(255,255,255,0.14), transparent 18%),
+                radial-gradient(circle at 82% 80%, rgba(255,255,255,0.08), transparent 20%);
+    pointer-events: none;
+    z-index: 1;
   }
-
+  body::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, rgba(23, 26, 37, 0.88), rgba(239, 234, 221, 0.16)),
+      radial-gradient(circle at top left, rgba(255, 247, 236, 0.16), transparent 18%),
+      radial-gradient(circle at bottom right, rgba(120, 113, 95, 0.12), transparent 22%),
+      url("assets/img/escola.jpg") center/cover no-repeat;
+    background-blend-mode: overlay, overlay, overlay, normal;
+    filter: blur(4px);
+    transform: scale(1.02);
+    z-index: 0;
+  }
   .login-container {
     position: relative;
-    z-index: 2;
-    min-height: calc(100vh - 70px);
+    z-index: 1;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px;
+    padding: 2rem 1.5rem;
   }
-
   .login-card {
     width: 100%;
-    max-width: 440px;
-    border-radius: 14px;
+    max-width: 520px;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(15,23,42,0.08);
+    box-shadow: 0 32px 80px rgba(15,23,42,0.14);
+    backdrop-filter: blur(18px);
   }
-
+  .login-card .card-body {
+    padding: 2rem;
+  }
+  .login-card img {
+    height: 52px;
+    object-fit: contain;
+  }
+  .login-card h3,
+  .login-card p {
+    color: #0f172a;
+  }
+  .login-card .form-label {
+    color: #475569;
+    font-weight: 600;
+  }
+  .login-card .form-control {
+    border-radius: 1rem;
+    border: 1px solid rgba(15,23,42,0.12);
+    background: rgba(255,255,255,0.95);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .login-card .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.2rem rgba(59,130,246,0.18);
+  }
+  .login-card .btn {
+    border-radius: 999px;
+    padding: 0.95rem 1rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .login-card .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(59,130,246,0.18);
+  }
   .footer-logos {
     position: fixed;
-    left: 0; right: 0; bottom: 0;
-    background: rgba(255,255,255,0.85);
-    border-top: 1px solid rgba(0,0,0,0.07);
-    padding: 6px 12px;
-    z-index: 3;
-    backdrop-filter: blur(6px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15,23,42,0.92);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    z-index: 2;
+    backdrop-filter: blur(18px);
   }
-
   .footer-logos .inner {
     max-width: 980px;
     margin: 0 auto;
   }
-
-  .footer-logos img{
+  .footer-logos img {
     width: 100%;
-    height: 44px;
+    height: 42px;
     object-fit: contain;
     display: block;
-    opacity: .95;
+    opacity: 0.88;
+    filter: saturate(0.9);
   }
-
-  @media (max-width: 576px){
-    body { padding-bottom: 62px; }
-    .login-container { min-height: calc(100vh - 62px); }
-    .footer-logos img{ height: 38px; }
+  @media (max-width: 576px) {
+    .login-container { padding: 1.5rem; }
+    .login-card { border-radius: 20px; }
+    .footer-logos img { height: 34px; }
   }
 </style>
 </head>
