@@ -111,8 +111,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .login-card .form-label {
-    color: #334155;
+    color: #0f172a !important;
     font-weight: 600;
+    opacity: 1 !important;
   }
   .login-card .text-muted {
     color: #64748b !important;

@@ -7,7 +7,7 @@ require_staff();
 $errors = [];
 $success = null;
 $name = '';
-$student_number = '';
+$login = '';
 $selected_students = [];
 
 $students = [];
@@ -20,6 +20,8 @@ if (isset($_POST['delete_guardian_id'])) {
   $stmt = $pdo->prepare('SELECT id FROM users WHERE id = ? AND role = ?');
   $stmt->execute([$delete_id, 'guardian']);
   if ($stmt->fetch()) {
+    $stmt = $pdo->prepare('DELETE FROM guardian_students WHERE guardian_id = ?');
+    $stmt->execute([$delete_id]);
     $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
     $stmt->execute([$delete_id]);
     $success = 'Encarregado removido com sucesso.';
@@ -29,14 +31,16 @@ if (isset($_POST['delete_guardian_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_guardian'])) {
-  $student_number = trim($_POST['student_number'] ?? '');
+  $login = trim($_POST['login'] ?? '');
   $name = trim($_POST['name'] ?? '');
   $password = $_POST['password'] ?? '';
   $password_confirm = $_POST['password_confirm'] ?? '';
   $selected_students = array_map('intval', $_POST['students'] ?? []);
 
-  if ($student_number === '') {
+  if ($login === '') {
     $errors[] = 'Login do encarregado é obrigatório.';
+  } elseif (!preg_match('/^[A-Za-z0-9_-]{3,20}$/', $login)) {
+    $errors[] = 'Login deve ter entre 3 e 20 caracteres sem espaços.';
   }
   if ($name === '') {
     $errors[] = 'Nome do encarregado é obrigatório.';
@@ -50,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_guardian'])) {
 
   if (empty($errors)) {
     $stmt = $pdo->prepare('SELECT id FROM users WHERE student_number = ? LIMIT 1');
-    $stmt->execute([$student_number]);
+    $stmt->execute([$login]);
     if ($stmt->fetchColumn()) {
       $errors[] = 'Já existe um utilizador com este login.';
     }
@@ -61,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_guardian'])) {
     $qr_secret = bin2hex(random_bytes(16));
 
     $stmt = $pdo->prepare('INSERT INTO users (role, student_number, name, password_hash, qr_secret) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute(['guardian', $student_number, $name, $password_hash, $qr_secret]);
+    $stmt->execute(['guardian', $login, $name, $password_hash, $qr_secret]);
     $guardian_id = (int)$pdo->lastInsertId();
 
     if ($selected_students) {
@@ -73,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_guardian'])) {
 
     $success = 'Encarregado registado com sucesso.';
     $name = '';
-    $student_number = '';
+    $login = '';
     $selected_students = [];
   }
 }
@@ -124,7 +128,7 @@ function eur($cents) {
           <input type="hidden" name="create_guardian" value="1">
           <div class="mb-3">
             <label class="form-label">Login do encarregado</label>
-            <input type="text" name="student_number" class="form-control" value="<?= htmlspecialchars($student_number) ?>" required>
+            <input type="text" name="login" class="form-control" value="<?= htmlspecialchars($login) ?>" required>
           </div>
           <div class="mb-3">
             <label class="form-label">Nome completo</label>
@@ -140,6 +144,7 @@ function eur($cents) {
           </div>
           <div class="mb-3">
             <label class="form-label">Alunos associados</label>
+            <div class="mb-2 small text-muted">Pesquise e selecione os alunos que este encarregado pode gerir.</div>
             <input type="text" id="studentSearch" class="form-control mb-3" placeholder="Pesquisar aluno por nome ou número">
             <div class="border rounded p-2" id="studentList" style="max-height: 280px; overflow:auto;">
               <?php foreach ($students as $student): ?>

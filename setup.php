@@ -39,6 +39,27 @@ CREATE TABLE IF NOT EXISTS wallet_transactions (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  price_cents INT NOT NULL,
+  category VARCHAR(50),
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS canteen_tickets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id INT NOT NULL,
+  ticket_type VARCHAR(50) NOT NULL,
+  reserved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('active','scanned','cancelled') NOT NULL DEFAULT 'active',
+  scanned_by_user_id INT NULL,
+  notes VARCHAR(255),
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (scanned_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS access_logs (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
@@ -90,6 +111,46 @@ if (!$guardian) {
 
 // Associações entre encarregados e alunos
 $pdo->exec("INSERT IGNORE INTO guardian_students(guardian_id, student_id) VALUES ($guardian, $aluno1)");
+
+// Produtos demo de bar/buffet
+$stmt = $pdo->query("SELECT COUNT(*) FROM products");
+if ((int)$stmt->fetchColumn() === 0) {
+  $prod = $pdo->prepare("INSERT INTO products(name, price_cents, category, is_active) VALUES (?, ?, ?, ?)");
+  $prod->execute(["Sandes Mista", 200, "meal", 1]);
+  $prod->execute(["Bolachas Digestivas", 80, "snack", 1]);
+  $prod->execute(["Água Pequena", 100, "drink", 1]);
+  $prod->execute(["Sumo de Laranja", 130, "drink", 1]);
+  $prod->execute(["Sumo de Maracujá", 130, "drink", 1]);
+  $prod->execute(["Banana", 120, "snack", 1]);
+  $prod->execute(["Maçã", 120, "snack", 1]);
+  $prod->execute(["Laranja", 120, "snack", 1]);
+} else {
+  $updates = [
+    "Bolachas" => "Bolachas Digestivas",
+    "Bolachas Digestivas e Sal" => "Bolachas Digestivas",
+    "Água" => "Água Pequena",
+    "Fruta" => "Banana",
+    "Sumo" => "Sumo de Laranja"
+  ];
+  $updateStmt = $pdo->prepare("UPDATE products SET name = ? WHERE name = ?");
+  foreach ($updates as $oldName => $newName) {
+    $updateStmt->execute([$newName, $oldName]);
+  }
+
+  $existingNames = $pdo->query("SELECT name FROM products")->fetchAll(PDO::FETCH_COLUMN);
+  $newProducts = [
+    ["Sumo de Maracujá", 130, "drink", 1],
+    ["Banana", 120, "snack", 1],
+    ["Maçã", 120, "snack", 1],
+    ["Laranja", 120, "snack", 1]
+  ];
+  $prod = $pdo->prepare("INSERT INTO products(name, price_cents, category, is_active) VALUES (?, ?, ?, ?)");
+  foreach ($newProducts as $item) {
+    if (!in_array($item[0], $existingNames, true)) {
+      $prod->execute($item);
+    }
+  }
+}
 
 // Carteiras (saldo)
 $pdo->exec("INSERT IGNORE INTO wallets(user_id, balance_cents) VALUES ($aluno1, 1250), ($aluno2, 500)");

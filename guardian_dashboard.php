@@ -21,8 +21,9 @@ $stmt = $pdo->prepare(
 );
 $stmt->execute([$guardian_id]);
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$student_count = count($students);
 
-if (!$selected_student_id && count($students) > 0) {
+if (!$selected_student_id && $student_count > 0) {
   $selected_student_id = (int)$students[0]["id"];
 }
 
@@ -94,9 +95,21 @@ if ($selected_student) {
   );
   $stmt->execute([$selected_student_id]);
   $accessRows = $stmt->fetchAll();
+
+  $stmt = $pdo->prepare(
+    "SELECT ct.ticket_type, ct.status, ct.notes, ct.reserved_at, u.name AS staff_name
+     FROM canteen_tickets ct
+     LEFT JOIN users u ON u.id = ct.scanned_by_user_id
+     WHERE ct.student_id = ?
+     ORDER BY ct.reserved_at DESC
+     LIMIT 20"
+  );
+  $stmt->execute([$selected_student_id]);
+  $canteenTickets = $stmt->fetchAll();
 } else {
   $transactions = [];
   $accessRows = [];
+  $canteenTickets = [];
 }
 
 function eur($cents) {
@@ -136,6 +149,7 @@ page_header('Encarregado - Saldo e Movimentos');
               <?php endforeach; ?>
             </select>
           </form>
+          <div class="small text-muted mb-3"><?= $student_count ?> aluno(s) associado(s)</div>
 
           <?php if ($selected_student): ?>
             <div class="text-muted">Saldo do aluno</div>
@@ -229,6 +243,37 @@ page_header('Encarregado - Saldo e Movimentos');
                 <?php endforeach; ?>
                 <?php if (!$accessRows): ?>
                   <tr><td colspan="2" class="text-muted">Sem registos de entradas/saídas.</td></tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Senhas de Cantina</h5>
+          <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Status</th>
+                  <th class="text-end">Staff</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($canteenTickets as $ticket): ?>
+                  <tr>
+                    <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($ticket['reserved_at']))) ?></td>
+                    <td><?= htmlspecialchars($ticket['ticket_type']) ?></td>
+                    <td><?= htmlspecialchars($ticket['status']) ?></td>
+                    <td class="text-end"><?= htmlspecialchars($ticket['staff_name'] ?: '-') ?></td>
+                  </tr>
+                <?php endforeach; ?>
+                <?php if (!$canteenTickets): ?>
+                  <tr><td colspan="4" class="text-muted">Sem senhas de cantina registadas.</td></tr>
                 <?php endif; ?>
               </tbody>
             </table>

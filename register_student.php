@@ -7,7 +7,6 @@ require_staff();
 
 $errors = [];
 $success = null;
-$qrToken = null;
 $student_number = '';
 $name = '';
 
@@ -21,6 +20,14 @@ if (isset($_POST['delete_student_id'])) {
   $stmt = $pdo->prepare('SELECT id FROM users WHERE id = ? AND role = ?');
   $stmt->execute([$id, 'student']);
   if ($stmt->fetch()) {
+    $stmt = $pdo->prepare('DELETE FROM guardian_students WHERE student_id = ?');
+    $stmt->execute([$id]);
+    $stmt = $pdo->prepare('DELETE FROM wallet_transactions WHERE user_id = ?');
+    $stmt->execute([$id]);
+    $stmt = $pdo->prepare('DELETE FROM access_logs WHERE user_id = ?');
+    $stmt->execute([$id]);
+    $stmt = $pdo->prepare('DELETE FROM canteen_tickets WHERE student_id = ?');
+    $stmt->execute([$id]);
     $stmt = $pdo->prepare('DELETE FROM wallets WHERE user_id = ?');
     $stmt->execute([$id]);
     $stmt = $pdo->prepare('DELETE FROM users WHERE id = ?');
@@ -43,6 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if ($student_number === '') {
     $errors[] = 'Número de estudante é obrigatório.';
+  } elseif (!preg_match('/^[A-Za-z0-9_-]{3,20}$/', $student_number)) {
+    $errors[] = 'Número de estudante deve ter entre 3 e 20 caracteres sem espaços.';
   }
   if ($name === '') {
     $errors[] = 'Nome do aluno é obrigatório.';
