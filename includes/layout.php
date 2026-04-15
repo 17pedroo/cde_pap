@@ -113,6 +113,10 @@ function page_header(string $title) { ?>
       <?php if (($_SESSION["role"] ?? "") === "staff" || ($_SESSION["role"] ?? "") === "admin"): ?>
         <a class="btn btn-outline-dark btn-sm" href="scanner.php">Scanner</a>
         <a class="btn btn-outline-dark btn-sm" href="portaria_logs.php">Leituras</a>
+        <a class="btn btn-outline-dark btn-sm" href="canteen.php">Cantina</a>
+        <a class="btn btn-outline-dark btn-sm" href="bar.php">Bar</a>
+        <a class="btn btn-outline-dark btn-sm" href="manage_products.php">Produtos</a>
+        <a class="btn btn-outline-dark btn-sm" href="reports.php">Relatórios</a>
         <a class="btn btn-outline-dark btn-sm" href="register_student.php">Alunos</a>
         <a class="btn btn-outline-dark btn-sm" href="register_guardian.php">Encarregados</a>
       <?php endif; ?>

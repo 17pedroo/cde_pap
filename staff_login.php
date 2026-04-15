@@ -127,8 +127,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 
   .form-label {
-    color: #f8fafc;
+    color: #0f172a !important;
     font-weight: 600;
+    opacity: 1 !important;
   }
 
   .form-control {
