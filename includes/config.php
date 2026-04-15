@@ -14,6 +14,36 @@ if (file_exists($env_path)) {
   $DB_NAME = getenv("DB_NAME") ?: null;
   $DB_USER = getenv("DB_USER") ?: null;
   $DB_PASS = getenv("DB_PASS") ?: null;
+
+  if (!$DB_HOST) {
+    $DB_HOST = getenv("MYSQL_HOST") ?: null;
+  }
+  if (!$DB_PORT) {
+    $DB_PORT = getenv("MYSQL_PORT") ?: null;
+  }
+  if (!$DB_NAME) {
+    $DB_NAME = getenv("MYSQL_DATABASE") ?: getenv("MYSQL_DB") ?: null;
+  }
+  if (!$DB_USER) {
+    $DB_USER = getenv("MYSQL_USER") ?: null;
+  }
+  if (!$DB_PASS) {
+    $DB_PASS = getenv("MYSQL_PASSWORD") ?: getenv("MYSQL_PASS") ?: null;
+  }
+
+  $mysqlUrl = getenv("MYSQL_URL") ?: getenv("MYSQL_PUBLIC_URL") ?: getenv("DATABASE_URL");
+  if ($mysqlUrl) {
+    $parsed = parse_url($mysqlUrl);
+    if ($parsed !== false) {
+      $DB_HOST = $DB_HOST ?: ($parsed["host"] ?? null);
+      $DB_PORT = $DB_PORT ?: ($parsed["port"] ?? null);
+      $DB_USER = $DB_USER ?: ($parsed["user"] ?? null);
+      $DB_PASS = $DB_PASS ?: ($parsed["pass"] ?? null);
+      if (!$DB_NAME && !empty($parsed["path"])) {
+        $DB_NAME = ltrim($parsed["path"], "/");
+      }
+    }
+  }
 }
 
 if ($DB_HOST && str_contains($DB_HOST, ":") && !$DB_PORT) {
