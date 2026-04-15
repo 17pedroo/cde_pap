@@ -173,4 +173,4 @@ if ((int)$stmt->fetchColumn() === 0) {
 echo "<h2>Setup concluído ✅</h2>";
 echo "<p><b>Aluno Demo 1:</b> nº 12345 / pass 1234</p>";
 echo "<p><b>Aluno Demo 2:</b> nº 23456 / pass 1234</p>";
-echo "<p><b>Staff (Portaria):</b> login em staff_login.php com pass admin123</p>";
+echo "<p><b>Staff (Portaria):</b> acesso em staff_login.php com palavra-passe admin123</p>";

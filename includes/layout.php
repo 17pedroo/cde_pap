@@ -101,7 +101,7 @@ function page_header(string $title) { ?>
 
     <div class="ms-auto d-flex align-items-center gap-2 flex-wrap">
       <?php if (($_SESSION["role"] ?? "") === "student"): ?>
-        <a class="btn btn-outline-primary btn-sm" href="dashboard.php">Dashboard</a>
+        <a class="btn btn-outline-primary btn-sm" href="dashboard.php">Início</a>
         <a class="btn btn-outline-primary btn-sm" href="movimentos.php">Movimentos</a>
         <a class="btn btn-outline-primary btn-sm" href="acessos.php">Acessos</a>
       <?php endif; ?>

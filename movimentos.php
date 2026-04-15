@@ -24,6 +24,15 @@ function eur($cents) {
   return number_format($cents/100, 2, ',', '.') . " €";
 }
 
+function translateTransactionType(string $type): string {
+  return match ($type) {
+    'topup' => 'Carregamento',
+    'purchase' => 'Compra',
+    'adjustment' => 'Ajuste',
+    default => ucfirst($type),
+  };
+}
+
 page_header("Movimentos");
 ?>
 <div class="row g-3">
@@ -54,7 +63,7 @@ page_header("Movimentos");
             <?php foreach ($rows as $r): ?>
               <tr>
                 <td><?= htmlspecialchars(date("d/m/Y H:i", strtotime($r["created_at"]))) ?></td>
-                <td><?= htmlspecialchars($r["type"]) ?></td>
+                <td><?= htmlspecialchars(translateTransactionType($r["type"])) ?></td>
                 <td><?= htmlspecialchars($r["description"] ?? "-") ?></td>
                 <td class="text-end <?= ((int)$r["amount_cents"] < 0) ? "text-danger" : "text-success" ?>">
                   <?= eur((int)$r["amount_cents"]) ?>

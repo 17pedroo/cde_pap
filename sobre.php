@@ -37,7 +37,7 @@ page_header("Sobre o Projeto");
         <h5 class="card-title">Funcionalidades</h5>
         <ul class="mb-0">
           <li>Login de aluno e portaria.</li>
-          <li>Dashboard com saldo e QR dinâmico.</li>
+          <li>Painel com saldo e QR dinâmico.</li>
           <li>Histórico de movimentos.</li>
           <li>Leitura de QR na portaria.</li>
           <li>Registo automático de IN/OUT.</li>

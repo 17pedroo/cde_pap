@@ -84,7 +84,7 @@ page_header("Gestão de Produtos");
           </div>
           <div class="mb-3">
             <label class="form-label">Categoria</label>
-            <input type="text" name="category" class="form-control" placeholder="meal, snack, drink">
+            <input type="text" name="category" class="form-control" placeholder="refeição, lanche, bebida">
           </div>
           <div class="form-check form-switch mb-3">
             <input class="form-check-input" type="checkbox" name="is_active" id="activeNew" checked>

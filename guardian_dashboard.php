@@ -116,6 +116,15 @@ function eur($cents) {
   return number_format($cents / 100, 2, ',', '.') . ' €';
 }
 
+function translateTransactionType(string $type): string {
+  return match ($type) {
+    'topup' => 'Carregamento',
+    'purchase' => 'Compra',
+    'adjustment' => 'Ajuste',
+    default => ucfirst($type),
+  };
+}
+
 page_header('Encarregado - Saldo e Movimentos');
 ?>
 <div class="mb-3">
@@ -201,7 +210,7 @@ page_header('Encarregado - Saldo e Movimentos');
                 <?php foreach ($transactions as $t): ?>
                   <tr>
                     <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($t['created_at']))) ?></td>
-                    <td><?= htmlspecialchars($t['type']) ?></td>
+                    <td><?= htmlspecialchars(translateTransactionType($t['type'])) ?></td>
                     <td><?= htmlspecialchars($t['description'] ?: '-') ?></td>
                     <td class="text-end <?= ((int)$t['amount_cents'] < 0) ? 'text-danger' : 'text-success' ?>">
                       <?= eur((int)$t['amount_cents']) ?>
@@ -234,9 +243,9 @@ page_header('Encarregado - Saldo e Movimentos');
                     <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($row['scanned_at']))) ?></td>
                     <td class="text-end">
                       <?php if ($row['action'] === 'IN'): ?>
-                        <span class="badge text-bg-success">IN</span>
+                        <span class="badge text-bg-success">Entrada</span>
                       <?php else: ?>
-                        <span class="badge text-bg-danger">OUT</span>
+                        <span class="badge text-bg-danger">Saída</span>
                       <?php endif; ?>
                     </td>
                   </tr>

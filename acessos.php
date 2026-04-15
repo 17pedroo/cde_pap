@@ -30,9 +30,9 @@ page_header("Acessos");
             <td><?= htmlspecialchars(date("d/m/Y H:i:s", strtotime($r["scanned_at"]))) ?></td>
             <td>
               <?php if ($r["action"] === "IN"): ?>
-                <span class="badge text-bg-success">IN (Entrada)</span>
+                <span class="badge text-bg-success">Entrada</span>
               <?php else: ?>
-                <span class="badge text-bg-danger">OUT (Saída)</span>
+                <span class="badge text-bg-danger">Saída</span>
               <?php endif; ?>
             </td>
           </tr>

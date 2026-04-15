@@ -22,11 +22,21 @@ $stmt = $pdo->prepare("
 $stmt->execute([$uid]);
 $accessRows = $stmt->fetchAll();
 
-page_header("Dashboard");
+page_header("Início");
 
 function eur($cents) {
   return number_format($cents/100, 2, ',', '.') . " €";
 }
+
+function translateTransactionType(string $type): string {
+  return match ($type) {
+    'topup' => 'Carregamento',
+    'purchase' => 'Compra',
+    'adjustment' => 'Ajuste',
+    default => ucfirst($type),
+  };
+}
+
 ?>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
@@ -96,9 +106,9 @@ function eur($cents) {
                 <td><?= htmlspecialchars(date("d/m H:i", strtotime($r["scanned_at"]))) ?></td>
                 <td class="text-end">
                   <?php if ($r["action"] === "IN"): ?>
-                    <span class="badge text-bg-success">IN</span>
+                    <span class="badge text-bg-success">Entrada</span>
                   <?php else: ?>
-                    <span class="badge text-bg-danger">OUT</span>
+                    <span class="badge text-bg-danger">Saída</span>
                   <?php endif; ?>
                 </td>
               </tr>

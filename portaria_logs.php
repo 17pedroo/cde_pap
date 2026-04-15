@@ -36,9 +36,9 @@ page_header("Leituras (Portaria)");
             <td><?= htmlspecialchars($r["student_number"] ?? "-") ?></td>
             <td class="text-end">
               <?php if ($r["action"] === "IN"): ?>
-                <span class="badge text-bg-success">IN</span>
+                <span class="badge text-bg-success">Entrada</span>
               <?php else: ?>
-                <span class="badge text-bg-danger">OUT</span>
+                <span class="badge text-bg-danger">Saída</span>
               <?php endif; ?>
             </td>
           </tr>
