@@ -161,8 +161,8 @@ async function initScanner() {
     cameraDetails = cams;
     cameraIds = cams.map(c => c.id);
     currentCameraId = cameraIds[0] || null;
-    const backCam = cams.find(c => (c.label || "").toLowerCase().includes("back") || (c.label || "").toLowerCase().includes("trase"));
-    if (backCam) currentCameraId = backCam.id;
+    const frontCam = cams.find(c => isFrontCamera(c.id) && !isBackCamera(c.id)) || cams.find(c => isFrontCamera(c.id));
+    if (frontCam) currentCameraId = frontCam.id;
   } catch (e) {
     setMessage("Não foi possível aceder à câmara.");
     return;

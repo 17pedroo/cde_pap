@@ -11,7 +11,7 @@ page_header("Acessos QR");
   <div>
     <span class="hero-label"><i class="bi bi-qr-code-scan"></i>Leitor de acessos</span>
     <h2>Entradas e saidas por QR</h2>
-    <p>Use a camara traseira e acompanhe a validacao em tempo real para gerir acessos no recinto escolar.</p>
+    <p>Use a camara frontal e acompanhe a validacao em tempo real para gerir acessos no recinto escolar.</p>
   </div>
   <div class="hero-actions">
     <a class="btn btn-primary" href="portaria_logs.php">Ver registos</a>
@@ -33,7 +33,7 @@ page_header("Acessos QR");
 
         <div class="scan-status">
           <div class="fw-semibold mb-2">Boas praticas</div>
-          <div class="text-muted small">Use a camara traseira, mantenha o QR estavel e recarregue apenas se a camera bloquear.</div>
+          <div class="text-muted small">Use a camara frontal, mantenha o QR estavel e recarregue apenas se a camera bloquear.</div>
         </div>
       </div>
     </div>
@@ -160,12 +160,11 @@ async function initScanner() {
     cameraIds = cameras.map(camera => camera.id);
     currentCameraId = cameraIds[0] || null;
 
-    const backCamera = cameras.find(camera => (camera.label || "").toLowerCase().includes("back")) ||
-      cameras.find(camera => (camera.label || "").toLowerCase().includes("trase")) ||
-      cameras.find(camera => (camera.label || "").toLowerCase().includes("rear"));
+    const frontCamera = cameras.find(camera => isFrontCamera(camera.id) && !isBackCamera(camera.id)) ||
+      cameras.find(camera => isFrontCamera(camera.id));
 
-    if (backCamera) {
-      currentCameraId = backCamera.id;
+    if (frontCamera) {
+      currentCameraId = frontCamera.id;
     }
   } catch (error) {
     resultEl.textContent = "Nao foi possivel aceder a camara.";
