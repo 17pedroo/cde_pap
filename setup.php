@@ -70,6 +70,15 @@ CREATE TABLE IF NOT EXISTS access_logs (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (scanned_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS qr_token_uses (
+  token_nonce CHAR(32) PRIMARY KEY,
+  user_id INT NOT NULL,
+  used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at DATETIME NOT NULL,
+  INDEX idx_qr_token_uses_expires_at (expires_at),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 ");
 
 // helper: criar utilizador se não existir

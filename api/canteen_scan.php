@@ -40,6 +40,16 @@ if (!$user) {
 }
 
 try {
+  if (!consume_qr_token($pdo, $verified, 60)) {
+    echo json_encode(["ok" => false, "error" => "QR já utilizado. Aguarde a próxima atualização do código."]);
+    exit;
+  }
+} catch (PDOException $e) {
+  echo json_encode(["ok" => false, "error" => "Não foi possível validar o QR neste momento."]);
+  exit;
+}
+
+try {
   $stmt = $pdo->prepare(
     "INSERT INTO canteen_tickets (student_id, ticket_type, scanned_by_user_id, notes) VALUES (?, ?, ?, ?)"
   );

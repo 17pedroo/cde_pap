@@ -6,7 +6,9 @@ require __DIR__ . "/includes/qr.php";
 require_staff();
 
 $errors = [];
+$page_errors = [];
 $success = null;
+$open_create_modal = false;
 $student_number = '';
 $name = '';
 
@@ -38,11 +40,11 @@ if (isset($_POST['delete_student_id'])) {
     $stmt->execute(['student']);
     $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
   } else {
-    $errors[] = 'Aluno não encontrado.';
+    $page_errors[] = 'Aluno não encontrado.';
   }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_student'])) {
   $student_number = trim($_POST['student_number'] ?? '');
   $name = trim($_POST['name'] ?? '');
   $password = $_POST['password'] ?? '';
@@ -88,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt->execute(['student']);
       $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+  } else {
+    $open_create_modal = true;
   }
 }
 page_header("Gestão de Alunos");
@@ -105,6 +109,20 @@ function eur($cents) {
 
 <?php if ($success): ?>
   <div class="alert alert-success"><?php echo htmlspecialchars($success, ENT_QUOTES); ?></div>
+<?php endif; ?>
+
+<?php if ($page_errors): ?>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <?php foreach ($page_errors as $error): ?>
+        <li><?php echo htmlspecialchars($error, ENT_QUOTES); ?></li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+<?php endif; ?>
+
+<?php if ($open_create_modal): ?>
+  <div class="alert alert-warning">O formulário de registo foi reaberto para corrigir os campos em falta.</div>
 <?php endif; ?>
 
 <div class="row g-3">
@@ -171,6 +189,7 @@ function eur($cents) {
         <?php endif; ?>
 
         <form method="post" novalidate>
+          <input type="hidden" name="create_student" value="1">
           <div class="mb-3">
             <label for="student_number" class="form-label">Número de estudante</label>
             <input type="text" id="student_number" name="student_number" class="form-control" value="<?php echo htmlspecialchars($student_number, ENT_QUOTES); ?>" required>
@@ -223,12 +242,6 @@ function eur($cents) {
 </div>
 
 <script>
-<?php if ($success): ?>
-setTimeout(() => {
-  location.reload();
-}, 1500);
-<?php endif; ?>
-
 const deleteModal = document.getElementById('deleteModal');
 deleteModal.addEventListener('show.bs.modal', function (event) {
   const button = event.relatedTarget;
@@ -237,6 +250,12 @@ deleteModal.addEventListener('show.bs.modal', function (event) {
   document.getElementById('studentName').textContent = name;
   document.getElementById('deleteStudentId').value = id;
 });
+
+<?php if ($open_create_modal): ?>
+const addStudentModalElement = document.getElementById('addStudentModal');
+const addStudentModal = new bootstrap.Modal(addStudentModalElement);
+addStudentModal.show();
+<?php endif; ?>
 </script>
 
 <?php page_footer();

@@ -36,6 +36,16 @@ if (!$user || $user["role"] !== "student") {
   exit;
 }
 
+try {
+  if (!consume_qr_token($pdo, $verified, 60)) {
+    echo json_encode(["ok" => false, "error" => "QR já utilizado. Aguarde a próxima atualização do código."]);
+    exit;
+  }
+} catch (PDOException $e) {
+  echo json_encode(["ok" => false, "error" => "Não foi possível validar o QR neste momento."]);
+  exit;
+}
+
 $stmt = $pdo->prepare("SELECT action FROM access_logs WHERE user_id=? ORDER BY scanned_at DESC LIMIT 1");
 $stmt->execute([$uid]);
 $last = $stmt->fetchColumn();

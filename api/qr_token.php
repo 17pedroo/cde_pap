@@ -12,7 +12,9 @@ $stmt->execute([$uid]);
 $secret = $stmt->fetchColumn();
 
 header("Content-Type: application/json");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 
 echo json_encode([
-  "token" => make_qr_token($uid, $secret)
+  "token" => make_qr_token($uid, $secret),
+  "refresh_after_seconds" => 15
 ]);

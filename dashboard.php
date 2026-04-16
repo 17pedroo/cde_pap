@@ -40,15 +40,22 @@ function translateTransactionType(string $type): string {
 ?>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
-<div class="mb-3">
-  <h4 class="mb-0">Olá, <?= htmlspecialchars($_SESSION["name"]) ?></h4>
-  <div class="text-muted">Bem-vindo ao teu cartão digital.</div>
+<div class="hero-banner">
+  <div>
+    <span class="hero-label"><i class="bi bi-person-badge"></i>Area do aluno</span>
+    <h2>Ola, <?= htmlspecialchars($_SESSION["name"]) ?></h2>
+    <p>Consulta saldo, apresenta o QR dinamico e acompanha os teus acessos num painel unico.</p>
+  </div>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="movimentos.php">Ver movimentos</a>
+    <a class="btn btn-outline-light" href="acessos.php">Ver acessos</a>
+  </div>
 </div>
 
 <div class="row g-3">
   <!-- SALDO -->
   <div class="col-12 col-lg-4">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm h-100 metric-card">
       <div class="card-body">
         <div class="text-muted">Saldo</div>
         <div class="display-6 mb-2"><?= eur($balance) ?></div>
@@ -61,12 +68,12 @@ function translateTransactionType(string $type): string {
 
   <!-- QR -->
   <div class="col-12 col-lg-4">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm h-100 metric-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start">
           <div>
             <h5 class="card-title mb-1">Cartão Digital</h5>
-            <div class="text-muted small">QR renova automaticamente</div>
+            <div class="text-muted small">QR de uso único com renovação automática</div>
           </div>
           <span class="badge text-bg-secondary">QR</span>
         </div>
@@ -82,7 +89,7 @@ function translateTransactionType(string $type): string {
 
   <!-- ACESSOS -->
   <div class="col-12 col-lg-4">
-    <div class="card shadow-sm h-100">
+    <div class="card shadow-sm h-100 metric-card">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start">
           <div>
@@ -126,23 +133,70 @@ function translateTransactionType(string $type): string {
 </div>
 
 <script>
-async function refreshQR(){
-  const r = await fetch("api/qr_token.php");
-  const data = await r.json();
+const qrContainer = document.getElementById("qrcode");
+const qrStatus = document.getElementById("qrstatus");
+const QR_FALLBACK_REFRESH_MS = 15000;
+let qrRefreshMs = QR_FALLBACK_REFRESH_MS;
+let nextQrRefreshAt = 0;
+let qrRefreshTimeout = null;
 
-  document.getElementById("qrcode").innerHTML = "";
-  new QRCode(document.getElementById("qrcode"), {
-    text: data.token,
-    width: 220,
-    height: 220
-  });
+function renderQrStatus(message) {
+  qrStatus.textContent = message;
+}
 
-  document.getElementById("qrstatus").textContent =
-    "Atualizado: " + new Date().toLocaleTimeString();
+function scheduleQrRefresh() {
+  if (qrRefreshTimeout) {
+    clearTimeout(qrRefreshTimeout);
+  }
+
+  qrRefreshTimeout = setTimeout(refreshQR, qrRefreshMs);
+}
+
+function updateQrCountdown() {
+  if (!nextQrRefreshAt) {
+    return;
+  }
+
+  const remainingSeconds = Math.max(0, Math.ceil((nextQrRefreshAt - Date.now()) / 1000));
+  if (remainingSeconds === 0) {
+    renderQrStatus("A atualizar QR...");
+    return;
+  }
+
+  renderQrStatus(`QR pronto para leitura. Atualiza em ${remainingSeconds}s.`);
+}
+
+async function refreshQR() {
+  renderQrStatus("A atualizar QR...");
+
+  try {
+    const response = await fetch("api/qr_token.php", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error("Falha ao carregar QR");
+    }
+
+    const data = await response.json();
+    qrRefreshMs = Math.max(5000, ((parseInt(data.refresh_after_seconds, 10) || 15) * 1000));
+
+    qrContainer.innerHTML = "";
+    new QRCode(qrContainer, {
+      text: data.token,
+      width: 220,
+      height: 220
+    });
+
+    nextQrRefreshAt = Date.now() + qrRefreshMs;
+    updateQrCountdown();
+    scheduleQrRefresh();
+  } catch (error) {
+    nextQrRefreshAt = Date.now() + QR_FALLBACK_REFRESH_MS;
+    renderQrStatus("Não foi possível atualizar o QR. Recarregue a página se o problema continuar.");
+    scheduleQrRefresh();
+  }
 }
 
 refreshQR();
-setInterval(refreshQR, 30000);
+setInterval(updateQrCountdown, 1000);
 </script>
 
 <?php page_footer(); ?>

@@ -1,197 +1,213 @@
 <?php
 require __DIR__ . "/includes/config.php";
 require __DIR__ . "/includes/auth.php";
+require __DIR__ . "/includes/layout.php";
+
 require_staff();
+
+page_header("Portaria");
 ?>
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <title>Leitor - Portaria</title>
-  <style>
-    body { background:#f8f9fa; }
-    .kiosk-wrap { max-width: 720px; }
-    #reader { width: 100%; max-width: 520px; margin: 0 auto; }
-    .big-status { font-size: 1.1rem; }
-  </style>
-</head>
-<body>
-<div class="container py-3 kiosk-wrap">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <div>
-      <h3 class="mb-0">Leitor de Entradas</h3>
-      <div class="text-muted">Aproxime o QR Code do aluno</div>
-    </div>
-    <a class="btn btn-outline-secondary btn-sm" href="logout.php">Sair</a>
+<div class="hero-banner">
+  <div>
+    <span class="hero-label"><i class="bi bi-qr-code-scan"></i>Fluxo de entrada</span>
+    <h2>Leitor de entradas e saidas</h2>
+    <p>Abra em ecra inteiro, use a camara traseira e acompanhe a validacao em tempo real no mesmo painel.</p>
   </div>
-
-  <div class="d-grid gap-2 d-md-flex mb-3">
-    <button id="btnFS" class="btn btn-dark">Ecrã inteiro</button>
-    <button id="btnSwitchCam" class="btn btn-outline-dark">Trocar câmara</button>
-    <button id="btnReload" class="btn btn-outline-secondary">Recarregar</button>
-  
-    <a href="register_student.php" class="ms-auto"><button class="btn btn-outline-success">Gestão alunos</button></a>
-  </div>
-
-  <div class="card shadow-sm">
-    <div class="card-body">
-      <div id="reader"></div>
-      <hr>
-      <div id="result" class="big-status fw-semibold">Aguardando leitura…</div>
-      <div id="details" class="text-muted"></div>
-    </div>
-  </div>
-
-  <div class="text-muted mt-3 small">
-    Dica: para melhor leitura, use a câmara traseira e boa iluminação.
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="portaria_logs.php">Ver leituras</a>
+    <a class="btn btn-outline-light" href="register_student.php">Gerir alunos</a>
   </div>
 </div>
 
-<!-- som simples (alguns browsers só tocam depois do primeiro clique - por isso temos botão de ecrã inteiro) -->
+<div class="row g-4">
+  <div class="col-12 col-xl-4">
+    <div class="card shadow-sm h-100 metric-card">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Controlo rapido</h5>
+        <div class="d-grid gap-2 mb-4">
+          <button id="btnFS" class="btn btn-dark">Ecra inteiro</button>
+          <button id="btnSwitchCam" class="btn btn-outline-dark">Trocar camara</button>
+          <button id="btnReload" class="btn btn-outline-secondary">Recarregar</button>
+        </div>
+
+        <div class="scan-status">
+          <div class="fw-semibold mb-2">Boas praticas</div>
+          <div class="text-muted small">Use a camara traseira, mantenha o QR estavel e recarregue apenas se a camera bloquear.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-xl-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+          <div>
+            <h5 class="card-title mb-1">Scanner de QR</h5>
+            <div class="text-muted small">Aproxime o codigo do aluno para registar IN ou OUT.</div>
+          </div>
+          <span class="badge text-bg-secondary">Portaria</span>
+        </div>
+
+        <div class="scan-reader">
+          <div id="reader"></div>
+        </div>
+
+        <div class="scan-status mt-3">
+          <div id="result" class="fw-semibold">Aguardando leitura...</div>
+          <div id="details" class="text-muted mt-1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <audio id="beep" preload="auto">
   <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" type="audio/wav">
 </audio>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  const resultEl  = document.getElementById('result');
-  const detailsEl = document.getElementById('details');
-  const beep      = document.getElementById('beep');
+const resultEl = document.getElementById("result");
+const detailsEl = document.getElementById("details");
+const beep = document.getElementById("beep");
 
-  const btnFS        = document.getElementById('btnFS');
-  const btnSwitchCam = document.getElementById('btnSwitchCam');
-  const btnReload    = document.getElementById('btnReload');
+const btnFS = document.getElementById("btnFS");
+const btnSwitchCam = document.getElementById("btnSwitchCam");
+const btnReload = document.getElementById("btnReload");
 
-  let lastScan = "";
-  let lastTime = 0;
+let lastScan = "";
+let lastTime = 0;
+let currentCameraId = null;
+let cameraIds = [];
+let scanner = null;
 
-  // fullscreen
-  btnFS.addEventListener("click", async () => {
-    try {
-      const el = document.documentElement;
-      if (el.requestFullscreen) await el.requestFullscreen();
-      // tentativa de "armar" o som (alguns browsers só deixam tocar após interação)
-      try { beep.play().then(()=>beep.pause()).catch(()=>{}); } catch(e) {}
-      resultEl.textContent = "Aguardando leitura…";
-      detailsEl.textContent = "";
-    } catch (e) {}
-  });
-
-  btnReload.addEventListener("click", () => location.reload());
-
-  async function sendToken(token) {
-    const r = await fetch("api/scan.php", {
-      method: "POST",
-      headers: {"Content-Type": "application/x-www-form-urlencoded"},
-      body: "token=" + encodeURIComponent(token)
-    });
-    return r.json();
-  }
-
-  function feedbackOK() {
-    try { beep.currentTime = 0; beep.play(); } catch(e) {}
-    if (navigator.vibrate) navigator.vibrate(120);
-  }
-
-  // ===== Camera / Scanner setup =====
-  let currentCameraId = null;
-  let cameraIds = [];
-  let scanner = null;
-
-  async function initScanner() {
-    // lista câmaras
-    cameraIds = [];
-    try {
-      const cams = await Html5Qrcode.getCameras();
-      cameraIds = cams.map(c => c.id);
-      currentCameraId = cameraIds[0] || null;
-    } catch (e) {
-      resultEl.textContent = "❌ Não foi possível aceder à câmara (permissões?).";
-      detailsEl.textContent = "";
-      return;
+btnFS.addEventListener("click", async () => {
+  try {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      await element.requestFullscreen();
     }
-
-    // tenta escolher a traseira se existir
-    // (nem sempre dá para identificar nomes em todos os dispositivos, mas tentamos)
     try {
-      const cams = await Html5Qrcode.getCameras();
-      const back = cams.find(c => (c.label || "").toLowerCase().includes("back")) ||
-                   cams.find(c => (c.label || "").toLowerCase().includes("trase")) ||
-                   cams.find(c => (c.label || "").toLowerCase().includes("rear"));
-      if (back) currentCameraId = back.id;
-    } catch (e) {}
-
-    // cria scanner
-    scanner = new Html5Qrcode("reader");
-
-    await startWithCamera(currentCameraId);
-  }
-
-  async function startWithCamera(camId) {
-    if (!scanner || !camId) return;
-
-    // se já está a correr, para primeiro
-    try { await scanner.stop(); } catch(e) {}
-
-    resultEl.textContent = "Aguardando leitura…";
+      await beep.play();
+      beep.pause();
+      beep.currentTime = 0;
+    } catch (error) {}
+    resultEl.textContent = "Aguardando leitura...";
     detailsEl.textContent = "";
+  } catch (error) {}
+});
 
-    const config = { fps: 10, qrbox: 250 };
+btnReload.addEventListener("click", () => location.reload());
 
-    await scanner.start(
-      { deviceId: { exact: camId } },
-      config,
-      async (decodedText) => {
-        // anti-dup (evita disparar mil vezes)
-        const now = Date.now();
-        if (decodedText === lastScan && (now - lastTime) < 2500) return;
-        lastScan = decodedText;
-        lastTime = now;
+async function sendToken(token) {
+  const response = await fetch("api/scan.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "token=" + encodeURIComponent(token)
+  });
+  return response.json();
+}
 
-        resultEl.textContent = "A validar…";
-        detailsEl.textContent = "";
+function feedbackOK() {
+  try {
+    beep.currentTime = 0;
+    beep.play();
+  } catch (error) {}
 
-        try {
-          const data = await sendToken(decodedText);
-          if (data.ok) {
-            feedbackOK();
-            resultEl.textContent = `✅ ${data.name} — ${data.action} registado`;
-            detailsEl.textContent = `Hora: ${data.time} | Nº: ${data.student_number ?? "-"}`;
-          } else {
-            resultEl.textContent = "❌ Erro: " + data.error;
-          }
-        } catch (e) {
-          resultEl.textContent = "❌ Erro ao comunicar com o servidor.";
-        }
-      },
-      () => { /* ignore scan failure callback */ }
-    );
+  if (navigator.vibrate) {
+    navigator.vibrate(120);
+  }
+}
+
+async function initScanner() {
+  cameraIds = [];
+  try {
+    const cameras = await Html5Qrcode.getCameras();
+    cameraIds = cameras.map(camera => camera.id);
+    currentCameraId = cameraIds[0] || null;
+
+    const backCamera = cameras.find(camera => (camera.label || "").toLowerCase().includes("back")) ||
+      cameras.find(camera => (camera.label || "").toLowerCase().includes("trase")) ||
+      cameras.find(camera => (camera.label || "").toLowerCase().includes("rear"));
+
+    if (backCamera) {
+      currentCameraId = backCamera.id;
+    }
+  } catch (error) {
+    resultEl.textContent = "Nao foi possivel aceder a camara.";
+    detailsEl.textContent = "Verifique permissoes do navegador.";
+    return;
   }
 
-  // trocar câmera
-  btnSwitchCam.addEventListener("click", async () => {
-    if (!cameraIds.length || !scanner) return;
+  scanner = new Html5Qrcode("reader");
+  await startWithCamera(currentCameraId);
+}
 
-    const idx = cameraIds.indexOf(currentCameraId);
-    const nextIdx = (idx === -1) ? 0 : (idx + 1) % cameraIds.length;
-    currentCameraId = cameraIds[nextIdx];
+async function startWithCamera(cameraId) {
+  if (!scanner || !cameraId) {
+    return;
+  }
 
-    try {
-      await startWithCamera(currentCameraId);
-      resultEl.textContent = "Aguardando leitura…";
-      detailsEl.textContent = "Câmara trocada.";
-    } catch (e) {
-      resultEl.textContent = "❌ Não foi possível trocar a câmara.";
+  try {
+    await scanner.stop();
+  } catch (error) {}
+
+  resultEl.textContent = "Aguardando leitura...";
+  detailsEl.textContent = "";
+
+  await scanner.start(
+    { deviceId: { exact: cameraId } },
+    { fps: 10, qrbox: 250 },
+    async decodedText => {
+      const now = Date.now();
+      if (decodedText === lastScan && (now - lastTime) < 2500) {
+        return;
+      }
+
+      lastScan = decodedText;
+      lastTime = now;
+      resultEl.textContent = "A validar...";
       detailsEl.textContent = "";
-    }
-  });
 
-  // iniciar
-  initScanner();
+      try {
+        const data = await sendToken(decodedText);
+        if (data.ok) {
+          feedbackOK();
+          resultEl.textContent = `${data.name} - ${data.action} registado`;
+          detailsEl.textContent = `Hora: ${data.time} | Numero: ${data.student_number ?? "-"}`;
+        } else {
+          resultEl.textContent = "Erro: " + data.error;
+        }
+      } catch (error) {
+        resultEl.textContent = "Erro ao comunicar com o servidor.";
+      }
+    },
+    () => {}
+  );
+}
+
+btnSwitchCam.addEventListener("click", async () => {
+  if (!cameraIds.length || !scanner) {
+    return;
+  }
+
+  const currentIndex = cameraIds.indexOf(currentCameraId);
+  const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % cameraIds.length;
+  currentCameraId = cameraIds[nextIndex];
+
+  try {
+    await startWithCamera(currentCameraId);
+    resultEl.textContent = "Aguardando leitura...";
+    detailsEl.textContent = "Camara trocada.";
+  } catch (error) {
+    resultEl.textContent = "Nao foi possivel trocar a camara.";
+    detailsEl.textContent = "";
+  }
+});
+
+initScanner();
 </script>
-</body>
-</html>
+
+<?php page_footer(); ?>
 
