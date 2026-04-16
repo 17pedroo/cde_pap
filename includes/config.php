@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Europe/Lisbon');
+
 $env_path = __DIR__ . "/../.env";
 if (file_exists($env_path)) {
   $env = parse_ini_file($env_path);
@@ -24,6 +26,9 @@ try {
       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
     ]
   );
+
+  $mysqlTimeOffset = (new DateTime('now', new DateTimeZone('Europe/Lisbon')))->format('P');
+  $pdo->exec("SET time_zone = " . $pdo->quote($mysqlTimeOffset));
 } catch (Exception $e) {
   die("Erro BD: " . $e->getMessage());
 }
