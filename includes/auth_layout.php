@@ -7,9 +7,9 @@ function auth_page_highlights(string $theme): array {
       ["icon" => "bi-phone", "text" => "Interface preparada para escritorio e telemovel."],
     ],
     "staff" => [
-      ["icon" => "bi-qr-code-scan", "text" => "Operacao rapida para portaria, cantina e bar."],
-      ["icon" => "bi-kanban", "text" => "Navegacao central para gestao de produtos, alunos e relatorios."],
-      ["icon" => "bi-tablet-landscape", "text" => "Leitura e controlo adaptados a postos fixos e dispositivos moveis."],
+      ["icon" => "bi-grid-1x2-fill", "text" => "Entrada central para acessos, cantina, bar, produtos e relatórios."],
+      ["icon" => "bi-kanban", "text" => "Navegação administrativa organizada por módulos e tarefas."],
+      ["icon" => "bi-tablet-landscape", "text" => "Fluxo adaptado a secretária, receção e dispositivos móveis."],
     ],
     default => [
       ["icon" => "bi-qr-code", "text" => "Mostre o QR dinamico e use o cartao digital em segundos."],

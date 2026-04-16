@@ -106,7 +106,7 @@ $staffStmt = $pdo->prepare("SELECT id FROM users WHERE role IN ('staff','admin')
 $staffStmt->execute();
 $staffId = $staffStmt->fetchColumn();
 if (!$staffId) {
-    $staffId = create_user($pdo, 'staff', null, 'Portaria Demo', 'portaria123', 'portaria-secret');
+    $staffId = create_user($pdo, 'staff', null, 'Admin Demo', 'portaria123', 'portaria-secret');
 }
 
 $guardianIds = [];
@@ -187,6 +187,6 @@ foreach ($studentIds as $studentId) {
 }
 
 echo "<h2>Dados de demonstração criados com sucesso ✅</h2>\n";
-echo "<p>Foram criados " . count($studentIds) . " alunos, " . count($guardianIds) . " encarregados, 1 funcionário de portaria e produtos de bar/cantina.</p>\n";
+echo "<p>Foram criados " . count($studentIds) . " alunos, " . count($guardianIds) . " encarregados, 1 conta de admin e produtos de bar/cantina.</p>\n";
 echo "<p>Login dos alunos: número de aluno = 10001.." . (10000 + count($studentIds)) . " e palavra-passe = 1234</p>\n";
-echo "<p>Login do staff de portaria: utilizador existente ou criado com palavra-passe = portaria123</p>\n";
+echo "<p>Login do admin demo: utilizador existente ou criado com palavra-passe = portaria123</p>\n";

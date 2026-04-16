@@ -141,6 +141,18 @@ function translateTicketStatus(string $status): string {
   };
 }
 
+function normalizeAdminName(?string $name): string {
+  $displayName = trim((string)$name);
+  if ($displayName === '') {
+    return '-';
+  }
+
+  $displayName = preg_replace('/portaria/i', 'Admin', $displayName) ?? $displayName;
+  $displayName = preg_replace('/staff/i', 'Admin', $displayName) ?? $displayName;
+
+  return $displayName;
+}
+
 $transaction_count = count($transactions);
 $access_count = count($accessRows);
 $ticket_count = count($canteenTickets);
@@ -372,7 +384,7 @@ page_header('Encarregado - Saldo e Movimentos');
                       <th>Data</th>
                       <th>Tipo</th>
                       <th>Estado</th>
-                      <th class="text-end">Staff</th>
+                      <th class="text-end">Admin</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -381,7 +393,7 @@ page_header('Encarregado - Saldo e Movimentos');
                         <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($ticket['reserved_at']))) ?></td>
                         <td><?= htmlspecialchars(translateTicketType($ticket['ticket_type'])) ?></td>
                         <td><?= htmlspecialchars(translateTicketStatus($ticket['status'])) ?></td>
-                        <td class="text-end"><?= htmlspecialchars($ticket['staff_name'] ?: '-') ?></td>
+                        <td class="text-end"><?= htmlspecialchars(normalizeAdminName($ticket['staff_name'] ?? null)) ?></td>
                       </tr>
                     <?php endforeach; ?>
                     <?php if (!$canteenTickets): ?>

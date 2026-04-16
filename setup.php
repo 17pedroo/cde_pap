@@ -100,14 +100,14 @@ function create_user(PDO $pdo, string $role, ?string $studentNumber, string $nam
 $aluno1 = create_user($pdo, "student", "12345", "Aluno Demo 1", "1234", "secret-12345");
 $aluno2 = create_user($pdo, "student", "23456", "Aluno Demo 2", "1234", "secret-23456");
 
-// Staff (portaria) - só 1 conta demo
+// Staff demo - só 1 conta demo
 // Como não tem student_number, se já existir um staff, não cria outro
 $stmt = $pdo->query("SELECT id FROM users WHERE role IN ('staff','admin') LIMIT 1");
 $existingStaff = $stmt->fetchColumn();
 if ($existingStaff) {
   $staff = (int)$existingStaff;
 } else {
-  $staff = create_user($pdo, "staff", null, "Portaria Demo", "admin123", "staff-secret");
+  $staff = create_user($pdo, "staff", null, "Admin Demo", "admin123", "staff-secret");
 }
 
 // Encarregado de educação demo
@@ -182,4 +182,4 @@ if ((int)$stmt->fetchColumn() === 0) {
 echo "<h2>Setup concluído ✅</h2>";
 echo "<p><b>Aluno Demo 1:</b> nº 12345 / pass 1234</p>";
 echo "<p><b>Aluno Demo 2:</b> nº 23456 / pass 1234</p>";
-echo "<p><b>Staff (Portaria):</b> acesso em staff_login.php com palavra-passe admin123</p>";
+echo "<p><b>Admin Demo:</b> acesso em staff_login.php com palavra-passe admin123</p>";

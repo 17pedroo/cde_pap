@@ -8,8 +8,7 @@ function app_role_label(string $role): string {
   return match ($role) {
     "student" => "Aluno",
     "guardian" => "Encarregado",
-    "staff" => "Staff",
-    "admin" => "Administrador",
+    "staff", "admin" => "Admin",
     default => "Acesso",
   };
 }
@@ -30,6 +29,21 @@ function app_user_initials(string $name): string {
   }
 
   return $initials !== "" ? $initials : "CD";
+}
+
+function app_display_name(string $name, string $role): string {
+  $displayName = trim($name);
+
+  if ($displayName === '') {
+    return app_role_label($role);
+  }
+
+  if ($role === 'staff' || $role === 'admin') {
+    $displayName = preg_replace('/portaria/i', 'Admin', $displayName) ?? $displayName;
+    $displayName = preg_replace('/staff/i', 'Admin', $displayName) ?? $displayName;
+  }
+
+  return $displayName;
 }
 
 function app_navigation_sections(string $role): array {
@@ -91,17 +105,23 @@ function app_navigation_sections(string $role): array {
     ],
     "staff", "admin" => [
       [
-        "label" => "Operacao",
+        "label" => "Admin",
         "items" => [
           [
+            "href" => "admin_dashboard.php",
+            "label" => "Painel admin",
+            "icon" => "bi-grid-1x2-fill",
+            "match" => ["admin_dashboard.php"],
+          ],
+          [
             "href" => "scanner.php",
-            "label" => "Portaria",
+            "label" => "Acessos QR",
             "icon" => "bi-qr-code-scan",
             "match" => ["scanner.php"],
           ],
           [
             "href" => "portaria_logs.php",
-            "label" => "Leituras",
+            "label" => "Registos de acessos",
             "icon" => "bi-journal-check",
             "match" => ["portaria_logs.php"],
           ],
@@ -120,7 +140,7 @@ function app_navigation_sections(string $role): array {
         ],
       ],
       [
-        "label" => "Gestao",
+        "label" => "Gestão",
         "items" => [
           [
             "href" => "manage_products.php",
@@ -168,7 +188,7 @@ function app_nav_is_active(array $item, string $currentScript): bool {
 }
 
 function render_app_sidebar(string $currentScript, string $role): void {
-  $name = trim((string)($_SESSION["name"] ?? "Utilizador"));
+  $name = app_display_name((string)($_SESSION["name"] ?? "Utilizador"), $role);
   $roleLabel = app_role_label($role);
   $sections = app_navigation_sections($role);
   $initials = app_user_initials($name);
@@ -227,7 +247,7 @@ function page_header(string $title) {
   $currentScript = app_current_script();
   $role = (string)($_SESSION["role"] ?? "guest");
   $roleLabel = app_role_label($role);
-  $name = trim((string)($_SESSION["name"] ?? "Utilizador"));
+  $name = app_display_name((string)($_SESSION["name"] ?? "Utilizador"), $role);
   ?>
 <!doctype html>
 <html lang="pt">

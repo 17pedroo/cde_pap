@@ -9,7 +9,7 @@ if (!empty($_SESSION["user_id"])) {
   } elseif ($role === "student") {
     header("Location: dashboard.php");
   } elseif ($role === "staff" || $role === "admin") {
-    header("Location: scanner.php");
+    header("Location: admin_dashboard.php");
   }
   exit;
 }

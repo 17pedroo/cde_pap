@@ -5,7 +5,7 @@ require __DIR__ . "/includes/auth_layout.php";
 if (!empty($_SESSION["user_id"])) {
   $role = $_SESSION["role"] ?? "";
   if ($role === "staff" || $role === "admin") {
-    header("Location: scanner.php");
+    header("Location: admin_dashboard.php");
   } elseif ($role === "student") {
     header("Location: dashboard.php");
   } elseif ($role === "guardian") {
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $_SESSION["user_id"] = (int)$u["id"];
     $_SESSION["role"] = $u["role"];
     $_SESSION["name"] = $u["name"];
-    header("Location: scanner.php");
+    header("Location: admin_dashboard.php");
     exit;
   } else {
     $error = "Palavra-passe inválida.";
@@ -36,10 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 ?>
 <?php auth_page_header(
-  "Acesso - Portaria",
-  "Acesso de staff",
-  "Entrar na operacao escolar",
-  "Aceda ao scanner, aos modulos de cantina e bar e aos paineis de gestao num fluxo unico.",
+  "Acesso - Admin",
+  "Acesso de admin",
+  "Entrar na administracao escolar",
+  "Entre num painel central com acessos, cantina, bar, gestão e relatórios.",
   "staff"
 ); ?>
 

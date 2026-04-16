@@ -84,7 +84,7 @@ foreach ($rows as $row) {
 
 if ($export === 'csv') {
   header('Content-Type: text/csv; charset=utf-8');
-  header('Content-Disposition: attachment; filename="leituras-portaria.csv"');
+  header('Content-Disposition: attachment; filename="registos-acessos.csv"');
 
   echo "\xEF\xBB\xBF";
   $output = fopen('php://output', 'w');
@@ -107,7 +107,7 @@ $export_params = $_GET;
 $export_params['export'] = 'csv';
 $export_url = '?' . http_build_query($export_params);
 
-page_header("Leituras (Portaria)");
+page_header("Registos de acessos");
 ?>
 <div class="row g-3">
   <div class="col-12">
@@ -115,7 +115,7 @@ page_header("Leituras (Portaria)");
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-3">
           <div>
-            <h5 class="card-title mb-1">Filtrar leituras de portaria</h5>
+            <h5 class="card-title mb-1">Filtrar registos de acessos</h5>
             <div class="text-muted small">Pesquise por aluno, número ou período e exporte a lista filtrada.</div>
           </div>
           <a class="btn btn-outline-primary btn-sm" href="<?= htmlspecialchars($export_url) ?>">Exportar CSV</a>

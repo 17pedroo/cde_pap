@@ -5,16 +5,17 @@ require __DIR__ . "/includes/layout.php";
 
 require_staff();
 
-page_header("Portaria");
+page_header("Acessos QR");
 ?>
 <div class="hero-banner">
   <div>
-    <span class="hero-label"><i class="bi bi-qr-code-scan"></i>Fluxo de entrada</span>
-    <h2>Leitor de entradas e saidas</h2>
-    <p>Abra em ecra inteiro, use a camara traseira e acompanhe a validacao em tempo real no mesmo painel.</p>
+    <span class="hero-label"><i class="bi bi-qr-code-scan"></i>Leitor de acessos</span>
+    <h2>Entradas e saidas por QR</h2>
+    <p>Use a camara traseira e acompanhe a validacao em tempo real para gerir acessos no recinto escolar.</p>
   </div>
   <div class="hero-actions">
-    <a class="btn btn-primary" href="portaria_logs.php">Ver leituras</a>
+    <a class="btn btn-primary" href="portaria_logs.php">Ver registos</a>
+    <a class="btn btn-outline-light" href="admin_dashboard.php">Painel admin</a>
     <a class="btn btn-outline-light" href="register_student.php">Gerir alunos</a>
   </div>
 </div>
@@ -46,7 +47,7 @@ page_header("Portaria");
             <h5 class="card-title mb-1">Scanner de QR</h5>
             <div class="text-muted small">Aproxime o codigo do aluno para registar IN ou OUT.</div>
           </div>
-          <span class="badge text-bg-secondary">Portaria</span>
+          <span class="badge text-bg-secondary">Acessos</span>
         </div>
 
         <div class="scan-reader">
