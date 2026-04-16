@@ -87,6 +87,16 @@ if ($selected_student) {
   $transactions = $stmt->fetchAll();
 
   $stmt = $pdo->prepare(
+    "SELECT amount_cents, description, created_at
+     FROM wallet_transactions
+     WHERE user_id = ? AND type = 'purchase' AND description LIKE 'Compra bar:%'
+     ORDER BY created_at DESC
+     LIMIT 20"
+  );
+  $stmt->execute([$selected_student_id]);
+  $barPurchases = $stmt->fetchAll();
+
+  $stmt = $pdo->prepare(
     "SELECT action, scanned_at
      FROM access_logs
      WHERE user_id = ?
@@ -108,6 +118,7 @@ if ($selected_student) {
   $canteenTickets = $stmt->fetchAll();
 } else {
   $transactions = [];
+  $barPurchases = [];
   $accessRows = [];
   $canteenTickets = [];
 }
@@ -123,6 +134,16 @@ function translateTransactionType(string $type): string {
     'adjustment' => 'Ajuste',
     default => ucfirst($type),
   };
+}
+
+function extractBarProductName(string $description): string {
+  $prefix = 'Compra bar: ';
+
+  if (str_starts_with($description, $prefix)) {
+    return trim(substr($description, strlen($prefix)));
+  }
+
+  return $description;
 }
 
 function translateTicketType(string $type): string {
@@ -154,9 +175,11 @@ function normalizeAdminName(?string $name): string {
 }
 
 $transaction_count = count($transactions);
+$bar_purchase_count = count($barPurchases);
 $access_count = count($accessRows);
 $ticket_count = count($canteenTickets);
 $latest_transaction = $transactions[0] ?? null;
+$latest_bar_purchase = $barPurchases[0] ?? null;
 $latest_access = $accessRows[0] ?? null;
 $latest_ticket = $canteenTickets[0] ?? null;
 
@@ -238,7 +261,7 @@ page_header('Encarregado - Saldo e Movimentos');
     <div class="col-12 col-xl-8">
       <?php if ($selected_student): ?>
       <div class="row g-3 mb-3">
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-xl-3">
           <div class="card shadow-sm metric-card h-100">
             <div class="card-body">
               <div class="text-muted">Movimentos</div>
@@ -254,7 +277,23 @@ page_header('Encarregado - Saldo e Movimentos');
           </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-xl-3">
+          <div class="card shadow-sm metric-card h-100">
+            <div class="card-body">
+              <div class="text-muted">Compras no bar</div>
+              <div class="display-6 mb-1"><?= $bar_purchase_count ?></div>
+              <div class="text-muted small">
+                <?php if ($latest_bar_purchase): ?>
+                  Última: <?= htmlspecialchars(extractBarProductName($latest_bar_purchase['description'])) ?> · <?= htmlspecialchars(date('d/m H:i', strtotime($latest_bar_purchase['created_at']))) ?>
+                <?php else: ?>
+                  Sem compras de bar registadas.
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3">
           <div class="card shadow-sm metric-card h-100">
             <div class="card-body">
               <div class="text-muted">Entradas e saídas</div>
@@ -270,7 +309,7 @@ page_header('Encarregado - Saldo e Movimentos');
           </div>
         </div>
 
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6 col-xl-3">
           <div class="card shadow-sm metric-card h-100">
             <div class="card-body">
               <div class="text-muted">Cantina</div>
@@ -301,6 +340,11 @@ page_header('Encarregado - Saldo e Movimentos');
             <li class="nav-item" role="presentation">
               <button class="nav-link active" id="guardian-movements-tab" data-bs-toggle="pill" data-bs-target="#guardian-movements" type="button" role="tab" aria-controls="guardian-movements" aria-selected="true">
                 Movimentos <span class="badge text-bg-light ms-2"><?= $transaction_count ?></span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="guardian-bar-tab" data-bs-toggle="pill" data-bs-target="#guardian-bar" type="button" role="tab" aria-controls="guardian-bar" aria-selected="false">
+                Bar <span class="badge text-bg-light ms-2"><?= $bar_purchase_count ?></span>
               </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -340,6 +384,34 @@ page_header('Encarregado - Saldo e Movimentos');
                     <?php endforeach; ?>
                     <?php if (!$transactions): ?>
                       <tr><td colspan="4" class="text-muted">Sem movimentos.</td></tr>
+                    <?php endif; ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="guardian-bar" role="tabpanel" aria-labelledby="guardian-bar-tab" tabindex="0">
+              <div class="table-responsive">
+                <table class="table table-striped align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Produto</th>
+                      <th>Descrição</th>
+                      <th class="text-end">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach ($barPurchases as $purchase): ?>
+                      <tr>
+                        <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($purchase['created_at']))) ?></td>
+                        <td><?= htmlspecialchars(extractBarProductName($purchase['description'])) ?></td>
+                        <td><?= htmlspecialchars($purchase['description']) ?></td>
+                        <td class="text-end text-danger"><?= eur((int)$purchase['amount_cents']) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                    <?php if (!$barPurchases): ?>
+                      <tr><td colspan="4" class="text-muted">Sem compras de bar registadas.</td></tr>
                     <?php endif; ?>
                   </tbody>
                 </table>
