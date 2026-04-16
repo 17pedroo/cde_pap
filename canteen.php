@@ -79,8 +79,39 @@ const btnReset = document.getElementById("btnReset");
 let scanner = null;
 let cameraIds = [];
 let currentCameraId = null;
+let cameraDetails = [];
 let lastScan = "";
 let lastTime = 0;
+
+function getCameraLabel(cameraId) {
+  const camera = cameraDetails.find(item => item.id === cameraId);
+  return (camera?.label || "").toLowerCase();
+}
+
+function isBackCamera(cameraId) {
+  const label = getCameraLabel(cameraId);
+  return label.includes("back") || label.includes("rear") || label.includes("trase") || label.includes("environment");
+}
+
+function isFrontCamera(cameraId) {
+  const label = getCameraLabel(cameraId);
+  return label.includes("front") || label.includes("frontal") || label.includes("user") || label.includes("face") || label.includes("selfie");
+}
+
+function syncPreviewOrientation(cameraId) {
+  const applyOrientation = () => {
+    const video = document.querySelector("#reader video");
+    if (!video) {
+      return;
+    }
+
+    const shouldUnmirror = isFrontCamera(cameraId) && !isBackCamera(cameraId);
+    video.style.transform = shouldUnmirror ? "scaleX(-1)" : "scaleX(1)";
+    video.style.transformOrigin = "center center";
+  };
+
+  requestAnimationFrame(() => requestAnimationFrame(applyOrientation));
+}
 
 function setMessage(main, details = "") {
   resultEl.textContent = main;
@@ -108,6 +139,7 @@ function feedbackOK() {
 async function initScanner() {
   try {
     const cams = await Html5Qrcode.getCameras();
+    cameraDetails = cams;
     cameraIds = cams.map(c => c.id);
     currentCameraId = cameraIds[0] || null;
     const backCam = cams.find(c => (c.label || "").toLowerCase().includes("back") || (c.label || "").toLowerCase().includes("trase"));
@@ -153,6 +185,8 @@ async function startScanner() {
     },
     () => {}
   );
+
+  syncPreviewOrientation(currentCameraId);
 }
 
 btnFS.addEventListener("click", async () => {

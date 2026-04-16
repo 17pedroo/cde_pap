@@ -81,7 +81,38 @@ let lastScan = "";
 let lastTime = 0;
 let currentCameraId = null;
 let cameraIds = [];
+let cameraDetails = [];
 let scanner = null;
+
+function getCameraLabel(cameraId) {
+  const camera = cameraDetails.find(item => item.id === cameraId);
+  return (camera?.label || "").toLowerCase();
+}
+
+function isBackCamera(cameraId) {
+  const label = getCameraLabel(cameraId);
+  return label.includes("back") || label.includes("rear") || label.includes("trase") || label.includes("environment");
+}
+
+function isFrontCamera(cameraId) {
+  const label = getCameraLabel(cameraId);
+  return label.includes("front") || label.includes("frontal") || label.includes("user") || label.includes("face") || label.includes("selfie");
+}
+
+function syncPreviewOrientation(cameraId) {
+  const applyOrientation = () => {
+    const video = document.querySelector("#reader video");
+    if (!video) {
+      return;
+    }
+
+    const shouldUnmirror = isFrontCamera(cameraId) && !isBackCamera(cameraId);
+    video.style.transform = shouldUnmirror ? "scaleX(-1)" : "scaleX(1)";
+    video.style.transformOrigin = "center center";
+  };
+
+  requestAnimationFrame(() => requestAnimationFrame(applyOrientation));
+}
 
 btnFS.addEventListener("click", async () => {
   try {
@@ -125,6 +156,7 @@ async function initScanner() {
   cameraIds = [];
   try {
     const cameras = await Html5Qrcode.getCameras();
+    cameraDetails = cameras;
     cameraIds = cameras.map(camera => camera.id);
     currentCameraId = cameraIds[0] || null;
 
@@ -186,6 +218,8 @@ async function startWithCamera(cameraId) {
     },
     () => {}
   );
+
+  syncPreviewOrientation(cameraId);
 }
 
 btnSwitchCam.addEventListener("click", async () => {
