@@ -36,12 +36,16 @@ page_header("Sobre o Projeto");
       <div class="card-body">
         <h5 class="card-title">Funcionalidades</h5>
         <ul class="mb-0">
-          <li>Login de aluno e portaria.</li>
-          <li>Painel com saldo e QR dinâmico.</li>
-          <li>Histórico de movimentos.</li>
-          <li>Leitura de QR na portaria.</li>
-          <li>Registo automático de IN/OUT.</li>
-          <li>Histórico de acessos e leituras.</li>
+          <li>Login de aluno, encarregado e admin.</li>
+          <li>Painel do aluno com saldo, QR dinâmico e histórico de movimentos.</li>
+          <li>Painel do encarregado com carregamentos, compras do bar, acessos e cantina do aluno.</li>
+          <li>Painel central de admin com acesso aos módulos principais.</li>
+          <li>Leitura de QR para registo de entradas e saídas.</li>
+          <li>Registo automático de acessos com histórico e filtros.</li>
+          <li>Gestão de compras no bar e buffet por QR Code.</li>
+          <li>Gestão de senhas de cantina.</li>
+          <li>Registo e gestão de alunos e encarregados.</li>
+          <li>Gestão de produtos e relatórios com exportação.</li>
         </ul>
       </div>
     </div>
@@ -56,7 +60,10 @@ page_header("Sobre o Projeto");
           <li>MySQL / phpMyAdmin</li>
           <li>HTML, CSS e Bootstrap</li>
           <li>JavaScript</li>
+          <li>Visual Studio Code</li>
+          <li>IA</li>
           <li>qrcodejs e html5-qrcode</li>
+          <li>Railway</li>
           <li>WampServer</li>
         </ul>
       </div>
@@ -82,8 +89,10 @@ page_header("Sobre o Projeto");
       <div class="card-body">
         <h5 class="card-title">Segurança</h5>
         <ul class="mb-0">
-          <li>Autenticação por sessão.</li>
-          <li>QR temporário e validado no servidor.</li>
+          <li>Autenticação por sessão com controlo de acesso por perfil.</li>
+          <li>Palavras-passe protegidas com hash.</li>
+          <li>QR dinâmico, temporário e de uso único.</li>
+          <li>Validação dos QR Codes no servidor antes de cada registo.</li>
           <li>Dados fictícios para cumprir RGPD.</li>
         </ul>
       </div>
@@ -95,9 +104,8 @@ page_header("Sobre o Projeto");
       <div class="card-body">
         <h5 class="card-title">Melhorias Futuras</h5>
         <ul class="mb-0">
-          <li>Integração com tablet fixo na portaria.</li>
-          <li>Integração com leitores QR dedicados.</li>
-          <li>Módulos de cantina e presenças.</li>
+          <li>Integração com leitores QR Code físicos.</li>
+          <li>Implementação de um novo sistema para funcionários.</li>
         </ul>
       </div>
     </div>

@@ -337,6 +337,13 @@ function page_header(string $title) {
       border-right: 0;
     }
 
+    .offcanvas.app-sidebar .offcanvas-body {
+      padding: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .offcanvas.app-sidebar .offcanvas-header {
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       color: #fff;
@@ -353,6 +360,11 @@ function page_header(string $title) {
       flex-direction: column;
       gap: 1.5rem;
       padding: 1.5rem;
+    }
+
+    .offcanvas.app-sidebar .app-sidebar-body {
+      min-height: auto;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     }
 
     .sidebar-brand {
@@ -932,7 +944,9 @@ function page_header(string $title) {
       <h5 class="offcanvas-title" id="appNavLabel">Navegacao</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
     </div>
-    <?php render_app_sidebar($currentScript, $role); ?>
+    <div class="offcanvas-body">
+      <?php render_app_sidebar($currentScript, $role); ?>
+    </div>
   </div>
 
   <main class="app-main">
